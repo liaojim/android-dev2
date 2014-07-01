@@ -185,20 +185,9 @@ public class MyActivity extends FragmentActivity
 
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 13));
 
-                MarkerOptions markerOptions = new  MarkerOptions()
-                        .title("Current: " + myLocation.latitude + " " + myLocation.longitude)
-                        .snippet(getAddressFromLocation(location))
-                        .position(myLocation)
-                        .visible(true);
+                displayAddressOnMarker(location);
 
-                // remove previous marker and add new marker.
-                if (marker != null)
-                    marker.remove();
-
-                marker = map.addMarker(markerOptions);
-                marker.showInfoWindow();
-
-                setVisible(true);
+                //setVisible(true);
 
 
 //                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
@@ -217,6 +206,27 @@ public class MyActivity extends FragmentActivity
             }
         }
 
+    }
+
+    private void displayAddressOnMarker(Location myLocation) {
+
+        if (myLocation != null) {
+            LatLng myLatLng = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .title("Current: " + myLatLng.latitude + " " + myLatLng.longitude)
+                    .snippet(getAddressFromLocation(location))
+                    .position(myLatLng)
+                    .visible(true);
+
+            // remove previous marker and add new marker.
+            if (marker != null)
+                marker.remove();
+
+            marker = map.addMarker(markerOptions);
+            marker.showInfoWindow();
+        }
     }
 
     private void setUpLocationClientIfNeeded() {
@@ -294,7 +304,8 @@ public class MyActivity extends FragmentActivity
         // set location and address field
         displayNewLocation(location);
 
-        centerMapOnMyLocation();
+        displayAddressOnMarker(location);
+        //centerMapOnMyLocation();
 
     }
 
