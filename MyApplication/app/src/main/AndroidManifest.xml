@@ -30,7 +30,7 @@
       See: https://developers.google.com/maps/documentation/android/start
       for instructions on how to get your own key. -->
         <meta-data android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDh577IQ7J4xkWNqDjiOn9_vIt5-Q12B7s"/>
+            android:value="AIzaSyCr-vKSYxFYh_6D73TsFPOuRN6u0XiCZcs"/>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -45,9 +45,7 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

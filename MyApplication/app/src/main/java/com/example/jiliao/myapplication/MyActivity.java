@@ -56,6 +56,8 @@ public class MyActivity extends FragmentActivity
     private TextView addressView;
     private Location location = null;
 
+    LocationManager locationManager = null;
+
     private GoogleMap map = null;
     private MapFragment mapFragment=null;
     private LocationClient mLocationClient;
@@ -119,6 +121,29 @@ public class MyActivity extends FragmentActivity
         mLocationClient.connect();
     }
 
+    /**
+     * @return the last know best location
+     */
+    private Location getLastBestLocation() {
+        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        long GPSLocationTime = 0;
+        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
+
+        long NetLocationTime = 0;
+
+        if (null != locationNet) {
+            NetLocationTime = locationNet.getTime();
+        }
+
+        if ( 0 < GPSLocationTime - NetLocationTime ) {
+            return locationGPS;
+        }
+        else {
+            return locationNet;
+        }
+    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -209,7 +234,7 @@ public class MyActivity extends FragmentActivity
 
     private void initLocationService() {
         // Start location service.
-        LocationManager locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -221,6 +246,9 @@ public class MyActivity extends FragmentActivity
 
         if (provider != null)
             locationManager.requestLocationUpdates(provider, 2000, 2, this);
+
+        // set the initial location before GPS onChanged Listener calls back.
+        location = getLastBestLocation();
     }
 
     @Override
@@ -234,7 +262,7 @@ public class MyActivity extends FragmentActivity
     }
 
     private void stopLocationService() {
-        LocationManager locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         locationManager.removeUpdates(this);
     }
 
