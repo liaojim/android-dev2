@@ -1,6 +1,7 @@
 package com.example.jiliao.myapplication;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Address;
@@ -49,22 +50,23 @@ public class MyActivity extends FragmentActivity
         GooglePlayServicesClient.ConnectionCallbacks {
 
     private static final String TAG = "myApp"+MyActivity.class.getSimpleName();
-    //private Button buttonGo;
+    private Button buttonGo;
     private TextView textView;
     private TextView locationView;
     private TextView addressView;
     private Location location = null;
 
     private GoogleMap map = null;
+    private MapFragment mapFragment=null;
     private LocationClient mLocationClient;
     Marker marker = null;
 
     // These settings are the same as the settings for the map. They will in fact give you updates
     // at the maximal rates currently possible.
-    private static final LocationRequest REQUEST = LocationRequest.create()
-            .setInterval(5000)         // 5 seconds
-            .setFastestInterval(16)    // 16ms = 60fps
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//    private static final LocationRequest REQUEST = LocationRequest.create()
+//            .setInterval(5000)         // 5 seconds
+//            .setFastestInterval(16)    // 16ms = 60fps
+//            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 
 
@@ -72,34 +74,38 @@ public class MyActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        setVisible(false);
+
+        mapFragment = MapFragment.newInstance();
+        FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.map_container, mapFragment);
+        fragmentTransaction.commit();
+
+        //setVisible(false);
 
         //centerMapOnMyLocation();
 
 
-//        locationView = (TextView)findViewById(R.id.textLocation);
-//        addressView = (TextView)findViewById(R.id.textAddress);
+        locationView = (TextView)findViewById(R.id.textLocation);
+        addressView = (TextView)findViewById(R.id.textAddress);
 
 
         // listen and process button click event
-//        buttonGo = (Button)findViewById(R.id.button);
-//        textView = (TextView)findViewById(R.id.textView);
-//
-//        buttonGo.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (textView.getCurrentTextColor() == Color.BLUE)
-//                    textView.setTextColor(Color.RED);
-//                else
-//                    textView.setTextColor(Color.BLUE);
-//
-//                // btw, start location service
-//                //initLocationService();
-//            }
-//        });
+        buttonGo = (Button)findViewById(R.id.button);
+        textView = (TextView)findViewById(R.id.textView);
 
+        buttonGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textView.getCurrentTextColor() == Color.BLUE)
+                    textView.setTextColor(Color.RED);
+                else
+                    textView.setTextColor(Color.BLUE);
 
-
+                // btw, start location service
+                //initLocationService();
+            }
+        });
     }
 
     @Override
@@ -111,18 +117,17 @@ public class MyActivity extends FragmentActivity
 
         setUpLocationClientIfNeeded();
         mLocationClient.connect();
-
-
-
     }
 
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
+            map = mapFragment.getMap();
+
             // Try to obtain the map from the SupportMapFragment.
-            SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            map = supportMapFragment.getMap();
+//            SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//            map = supportMapFragment.getMap();
 
 
             map.setOnMapClickListener(this);
@@ -145,7 +150,8 @@ public class MyActivity extends FragmentActivity
     private void centerMapOnMyLocation() {
 
         if (map!=null) {
-            Location location = map.getMyLocation();
+            Log.d(TAG, "centerMapOnMyLocation " );
+            //Location location = map.getMyLocation();
             LatLng myLocation = null;
 
             if (location != null) {
@@ -257,10 +263,10 @@ public class MyActivity extends FragmentActivity
         Log.d(TAG, "onLocationChanged " + location.getLatitude() + ", " + location.getLongitude());
         this.location = location;
 
-        centerMapOnMyLocation();
-
         // set location and address field
-        //displayNewLocation(location);
+        displayNewLocation(location);
+
+        centerMapOnMyLocation();
 
     }
 
@@ -280,11 +286,12 @@ public class MyActivity extends FragmentActivity
     }
 
     private void displayNewLocation(Location location) {
+        Log.d(TAG, "displayNewLocation " + location.getLatitude() + ", " + location.getLongitude());
         // display lat and lon;
-        //locationView.setText("Lat:"+location.getLatitude()+" "+"Lon:" + location.getLongitude());
+        locationView.setText("Lat:"+location.getLatitude()+" "+"Lon:" + location.getLongitude());
 
-        // display address
-        //addressView.setText(getAddressFromLocation(location));
+        //display address
+        addressView.setText(getAddressFromLocation(location));
     }
 
     private String getAddressFromLocation(Location location) {
